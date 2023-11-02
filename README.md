@@ -17,7 +17,7 @@ class ResistorCapacitor (object):
         return
 
 
-## Test code (place at bottom of the file)
+##test code (place at bottom of the file)
 if __name__ == "__main__":
     print("Self testing...")
     rc1 = ResistorCapacitor(1000.0, 1.0e-6)
@@ -33,4 +33,4 @@ if __name__ == "__main__":
     for vtime in range(0, 6):
         stime = vtime * 150.0e-3
         print(stime, rc2.voltage(stime))
-# done
+#done
