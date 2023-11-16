@@ -54,7 +54,7 @@ class VendingMachine(object):
                 "Steak(2.00)": ("Steak", 200)
     }
 
-    # List of coins: each tuple is ("VALUE", value in cents)
+    """List of coins: each tuple is ("VALUE", value in cents)"""
     COINS = {"5": ("5", 5),
             "10": ("10", 10),
             "25": ("25", 25),
@@ -68,7 +68,7 @@ class VendingMachine(object):
         self.event = ""  # no event detected
         self.amount = 0  # amount from coins inserted so far
         self.change_due = 0  # change due after vending
-        # Build a list of coins in descending order of value
+        """Build a list of coins in descending order of value"""
         values = []
         for k in self.COINS:
             values.append(self.COINS[k][1])
@@ -76,9 +76,11 @@ class VendingMachine(object):
         log(str(self.coin_values))
 
     def add_state(self, state):
+        """Adds a state to the vending machine."""
         self.states[state.name] = state
 
     def go_to_state(self, state_name):
+        """Transitions to a new state."""
         if self.state:
             log('Exiting %s' % (self.state.name))
             self.state.on_exit(self)
@@ -87,6 +89,7 @@ class VendingMachine(object):
         self.state.on_entry(self)
 
     def update(self):
+        """Updates the vending machine."""
         if self.state:
             self.state.update(self)
 
@@ -117,7 +120,7 @@ class State(object):
     def update(self, machine):
         pass
 
-# In the waiting state, the machine waits for the first coin
+"""In the waiting state, the machine waits for the first coin"""
 class WaitingState(State):
     _NAME = "waiting"
     def update(self, machine):
@@ -125,7 +128,7 @@ class WaitingState(State):
             machine.add_coin(machine.event)
             machine.go_to_state('add_coins')
 
-# Additional coins, until a product button is pressed
+"""Additional coins, until a product button is pressed"""
 class AddCoinsState(State):
     _NAME = "add_coins"
     def update(self, machine):
@@ -142,27 +145,29 @@ class AddCoinsState(State):
         else:
             pass  # else ignore the event, not enough money for product
 
-# Print the product being delivered
+"""Print the product being delivered"""
 class DeliverProductState(State):
     _NAME = "deliver_product"
     def on_entry(self, machine):
-        # Deliver the product and change state
+        """Deliver the product and change state"""
         
         machine.change_due = machine.amount - machine.PRODUCTS[machine.event][1]
         machine.amount = 0
         print("Buzz... Whir... Click...", machine.PRODUCTS[machine.event][0])
+        Servo.value = 0
+        sleep (0.5)
+        Servo.value = 1
         if machine.change_due > 0:
             machine.go_to_state('count_change')
         else:
             machine.go_to_state('waiting')
-            Servo.value = 0
-            sleep (0.5)
-            Servo.value = 1
-# Count out the change in coins
+            
+            
+"""Count out the change in coins"""
 class CountChangeState(State):
     _NAME = "count_change"
     def on_entry(self, machine):
-        # Return the change due and change state
+        """Return the change due and change state"""
         print("Change due: $%0.2f" % (machine.change_due / 100))
         log("Returning change: " + str(machine.change_due))
     def update(self, machine):
@@ -173,9 +178,9 @@ class CountChangeState(State):
         if machine.change_due == 0:
             machine.go_to_state('waiting')  # No more change due, done
 
-# MAIN PROGRAM
+"""MAIN PROGRAM"""
 if __name__ == "__main__":
-    # Define the GUI
+    """Define the GUI"""
     sg.theme('BluePurple')  # Keep things interesting for your users
 
     coin_col = []
@@ -200,10 +205,10 @@ if __name__ == "__main__":
     layout.append([sg.Button("RETURN", font=("Helvetica", 12))])
     window = sg.Window('Vending Machine', layout)
 
-    # new machine object
+    """new machine object"""
     vending = VendingMachine()
 
-    # Add the states
+    """Add the states"""
     vending.add_state(WaitingState())
     vending.add_state(AddCoinsState())
     vending.add_state(DeliverProductState())
@@ -212,9 +217,9 @@ if __name__ == "__main__":
     # Reset state is "waiting for coins"
     vending.go_to_state('waiting')
 
-    # Checks if being used on Pi
+    """Checks if being used on Pi"""
     if hardware_present:
-        # Set up the hardware button callback (do not use () after function!)
+        """Set up the hardware button callback (do not use () after function!)"""
         key1.when_pressed = vending.button_action
 
     # The Event Loop: begin continuous processing of events
@@ -234,3 +239,4 @@ if __name__ == "__main__":
 
     window.close()
     print("Normal exit")
+
