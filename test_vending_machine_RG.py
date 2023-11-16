@@ -1,3 +1,6 @@
+# Ryan Groskopf
+# Student Id: 100880623
+# Pytest
 import pytest
 from unittest.mock import Mock, patch
 from vending_machine_RG import VendingMachine, WaitingState, AddCoinsState, DeliverProductState, CountChangeState
@@ -23,8 +26,24 @@ def test_VendingMachine():
     assert vending.amount == 200  # pennies, was .total
 
     vending.event = '5'
+    vending.update()
     assert vending.state.name == 'add_coins'
-    assert vending.amount == 200  # Adjusted the expected amount to 200
+    assert vending.amount == 205  # Adjusted the expected amount to 200
+    
+    vending.event = '10'
+    vending.update()
+    assert vending.state.name == 'add_coins'
+    assert vending.amount == 215
+    
+    vending.event = '25'
+    vending.update()
+    assert vending.state.name == 'add_coins'
+    assert vending.amount == 240
+    
+    vending.event = '100'
+    vending.update()
+    assert vending.state.name == 'add_coins'
+    assert vending.amount == 340
 
 def test_buy_product():
     vending = VendingMachine()
